@@ -1,7 +1,7 @@
-import 'package:blablacar/model/ride/ride.dart';
+import 'package:blabla/model/ride/locations.dart';
 
-import 'package:blablacar/model/ride/locations.dart';
-import 'package:blablacar/services/rides_service.dart';
+import 'package:blabla/model/ride/ride.dart';
+import 'package:blabla/services/rides_service.dart';
 
 void main() {
   Location dijon = Location(country: Country.france, name: "Dijon");

@@ -26,15 +26,12 @@ class RidesService {
   //  filter the rides   with several optional criteria (flexible filter options)
   //
   static List<Ride> filterBy({Location? departure, int? seatRequested}) {
-    List<Ride> found = [];
+    List<Ride> found = availableRides;
     if (departure != null) {
-      found = _filterByDeparture(availableRides, departure);
+      found = _filterByDeparture(found, departure);
     }
     if (seatRequested != null) {
-      if (departure == null) {
-        found = _filterBySeatRequested(availableRides, seatRequested);
-      }
-      found.addAll(_filterBySeatRequested(found, seatRequested));
+      found = _filterBySeatRequested(found, seatRequested);
     }
 
     return found;
