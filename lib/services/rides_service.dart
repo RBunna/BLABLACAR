@@ -1,39 +1,26 @@
-import '../dummy_data/dummy_data.dart';
-import '../model/ride/locations.dart';
+import '../data/dummy_data.dart';
 import '../model/ride/ride.dart';
+import '../model/ride_pref/ride_pref.dart';
 
+////
+///   This service handles:
+///   - The list of available rides
+///
 class RidesService {
-  static List<Ride> availableRides = fakeRides; // TODO for now fake data
+  static List<Ride> allRides = fakeRides;
 
-  //
-  //  filter the rides starting from given departure location
-  //
-  static List<Ride> _filterByDeparture(List<Ride> rides, Location departure) {
-    return rides.where((ride) => ride.departureLocation == departure).toList();
-  }
-
-  //
-  //  filter the rides starting for the given requested seat number
-  //
-  static List<Ride> _filterBySeatRequested(
-    List<Ride> rides,
-    int requestedSeat,
-  ) {
-    return rides.where((ride) => ride.remainingSeats >= requestedSeat).toList();
-  }
-
-  //
-  //  filter the rides   with several optional criteria (flexible filter options)
-  //
-  static List<Ride> filterBy({Location? departure, int? seatRequested}) {
-    List<Ride> found = availableRides;
-    if (departure != null) {
-      found = _filterByDeparture(found, departure);
-    }
-    if (seatRequested != null) {
-      found = _filterBySeatRequested(found, seatRequested);
-    }
-
-    return found;
+ 
+  ///
+  ///  Return the relevant rides, given the passenger preferences
+  ///
+  static List<Ride> getRidesFor(RidePreference preferences) {
+    return allRides
+        .where(
+          (ride) =>
+              ride.departureLocation == preferences.departure &&
+              ride.arrivalLocation == preferences.arrival &&
+              ride.availableSeats >= preferences.requestedSeats
+        )
+        .toList();
   }
 }
