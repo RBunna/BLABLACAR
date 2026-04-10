@@ -1,7 +1,8 @@
-import 'package:blabla/services/location_service.dart';
 import 'package:blabla/ui/widgets/display/bla_divider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../../../data/repositories/locations/locations_repository.dart';
 import '../../../model/ride/locations.dart';
 import '../../theme/theme.dart';
 
@@ -46,11 +47,11 @@ class _BlaLocationPickerState extends State<BlaLocationPicker> {
     });
   }
 
-  List<Location> get filteredLocation {
+  List<Location> filteredLocation(List<Location> locations) {
     if (currentSearchText.length < 2) {
       return [];
     }
-    return LocationsService.availableLocations
+    return locations
         .where(
           (location) => location.name.toUpperCase().contains(
             currentSearchText.toUpperCase(),
@@ -61,35 +62,47 @@ class _BlaLocationPickerState extends State<BlaLocationPicker> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.only(
-          left: BlaSpacings.m,
-          right: BlaSpacings.m,
-          top: BlaSpacings.s,
-        ),
-        child: Column(
-          children: [
-            LocationSearchBar(
-              initSearch: currentSearchText,
-              onBackTap: onBackTap,
-              onSearchChanged: onSearchChanged,
+    final LocationsRepository locationsRepository = context
+        .read<LocationsRepository>();
+
+    return FutureBuilder(
+      future: locationsRepository.getLocations(),
+      builder: (context, asyncSnapshot) {
+        return Scaffold(
+          body: Padding(
+            padding: const EdgeInsets.only(
+              left: BlaSpacings.m,
+              right: BlaSpacings.m,
+              top: BlaSpacings.s,
             ),
-
-            SizedBox(height: 20),
-
-            Expanded(
-              child: ListView.builder(
-                itemCount: filteredLocation.length,
-                itemBuilder: (context, index) => LocationTile(
-                  location: filteredLocation[index],
-                  onTap: onTap,
+            child: Column(
+              children: [
+                LocationSearchBar(
+                  initSearch: currentSearchText,
+                  onBackTap: onBackTap,
+                  onSearchChanged: onSearchChanged,
                 ),
-              ),
+
+                SizedBox(height: 20),
+
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: filteredLocation(
+                      asyncSnapshot.requireData,
+                    ).length,
+                    itemBuilder: (context, index) => LocationTile(
+                      location: filteredLocation(
+                        asyncSnapshot.requireData,
+                      )[index],
+                      onTap: onTap,
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }
